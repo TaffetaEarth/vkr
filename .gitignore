@@ -1,3 +1,4 @@
 /.vscode
-/server/app
+/server/app/bin
+/server/app/pkg
 /server/build

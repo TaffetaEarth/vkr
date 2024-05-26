@@ -14,6 +14,5 @@ FROM alpine:latest
 
 WORKDIR /app
 COPY --from=build /app/hello .
-COPY --from=build /app/classic.mp3 .
 
 CMD ["./hello"]

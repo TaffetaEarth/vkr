@@ -1,4 +1,4 @@
 /.vscode
-/server/app/bin
-/server/app/pkg
-/server/build
+/streamer/app/bin
+/streamer/app/pkg
+/streamer/build

@@ -1,6 +1,6 @@
 services:
   server:
-    build: server
+    build: streamer
     ports: 
       - 8000:8080
     depends_on:

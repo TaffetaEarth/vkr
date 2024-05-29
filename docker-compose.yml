@@ -8,6 +8,16 @@ services:
       - db
       - redis
 
+  crud:
+    build: crud_platform
+    ports: 
+      - 8001:8080
+    depends_on:
+      - minio 
+      - db
+      - redis
+      
+
 
   db:
     image: postgres:alpine

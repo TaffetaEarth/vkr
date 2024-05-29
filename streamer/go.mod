@@ -1,4 +1,4 @@
-module github.com/TaffetaEarth/vkr
+module github.com/TaffetaEarth/vkr/streamer
 
 go 1.20
 

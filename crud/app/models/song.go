@@ -7,9 +7,10 @@ import (
 type Song struct {
 	gorm.Model
 	Author Author
+	AuthorID *uint
 	Album Album
-	Year uint
+	AlbumID *uint
+	Playlists []Playlist `gorm:"many2many:songs_playlits;"`
 	Name string
-	FileName string `gorm:"unique:true"`
+	FileUrl string `gorm:"unique:true"`
 }
-

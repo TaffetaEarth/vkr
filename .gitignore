@@ -2,3 +2,4 @@
 /streamer/app/bin
 /streamer/app/pkg
 /streamer/build
+/rabbitmq

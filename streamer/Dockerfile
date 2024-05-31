@@ -1,18 +1,17 @@
 FROM golang:alpine AS build
 
-WORKDIR /app
-COPY ./app .
+WORKDIR /streamer
+COPY ./app ./app
 
 COPY go.mod .
 COPY go.sum .
-COPY classic.mp3 .
 
 RUN go mod download
-RUN go build -o /app/hello
+RUN go build -o ./build/app ./app
 
 FROM alpine:latest
 
 WORKDIR /app
-COPY --from=build /app/hello .
+COPY --from=build streamer/build/app .
 
-CMD ["./hello"]
+CMD ["./app"]

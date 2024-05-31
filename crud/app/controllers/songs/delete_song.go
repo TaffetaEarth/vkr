@@ -3,7 +3,7 @@ package songs
 import (
 	"net/http"
 
-	"github.com/TaffetaEarth/vkr/crud/app/models"
+	"crud/app/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +14,7 @@ func (h handler) DeleteSong(ctx *gin.Context) {
     var song models.Song
 
     if result := h.DB.First(&song, id); result.Error != nil {
-        ctx.AbortWithError(http.StatusNotFound, result.Error)
+        ctx.JSON(http.StatusNotFound, result.Error)
         return
     }
 

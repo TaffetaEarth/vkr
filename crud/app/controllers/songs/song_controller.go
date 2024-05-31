@@ -14,11 +14,12 @@ func RegisterRoutes(router *gin.Engine, db *gorm.DB) {
         DB: db,
     }
 
-    routes := router.Group("/Songs")
-    routes.POST("/", h.AddSong)
+    routes := router.Group("/songs")
+    routes.POST("/", h.CreateSong)
     routes.GET("/", h.GetSongs)
     routes.GET("/:id", h.GetSong)
     routes.PUT("/:id", h.UpdateSong)
+    routes.PUT("/:id/upload_file", h.UploadFile)
     routes.DELETE("/:id", h.DeleteSong)
 }
 

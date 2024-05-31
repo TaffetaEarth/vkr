@@ -3,16 +3,16 @@ package songs
 import (
 	"net/http"
 
-	"github.com/TaffetaEarth/vkr/crud/app/models"
+	"crud/app/models"
 
 	"github.com/gin-gonic/gin"
 )
 
 type UpdateSongRequestBody struct {
     Name      string `json:"title"`
-    AuthorID  uint `json:"author_id"`
-    AlbumID   uint `json:"album_id"`
-    Year 		  uint `json:"year"`
+    AuthorID  uint   `json:"author_id"`
+    AlbumID   uint   `json:"album_id"`
+    Year 	  uint   `json:"year"`
 }
 
 func (h handler) UpdateSong(ctx *gin.Context) {
@@ -20,7 +20,7 @@ func (h handler) UpdateSong(ctx *gin.Context) {
     body := UpdateSongRequestBody{}
 
     if err := ctx.BindJSON(&body); err != nil {
-        ctx.AbortWithError(http.StatusBadRequest, err)
+        ctx.JSON(http.StatusBadRequest, err)
         return
     }
 
@@ -29,7 +29,7 @@ func (h handler) UpdateSong(ctx *gin.Context) {
 	var album models.Album
 
     if result := h.DB.First(&song, id); result.Error != nil {
-        ctx.AbortWithError(http.StatusNotFound, result.Error)
+        ctx.JSON(http.StatusNotFound, result.Error)
         return
     }
 
@@ -37,12 +37,11 @@ func (h handler) UpdateSong(ctx *gin.Context) {
 	h.DB.FirstOrCreate(&album, body.AlbumID)
 
 	song.Name = body.Name
-	song.Year = body.Year
 
 	h.DB.Save(&song)
 
-	h.DB.Model(&author).Association("Songs").Append(&song)
-	h.DB.Model(&album).Association("Songs").Append(&song)
+	h.DB.Model(&song).Association("Authors").Replace(&author)
+	h.DB.Model(&song).Association("Album").Append(&album)
 
     ctx.JSON(http.StatusOK, &song)
 }

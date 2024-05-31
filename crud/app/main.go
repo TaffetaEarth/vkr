@@ -4,8 +4,8 @@ import (
 	// "log"
 	"github.com/gin-gonic/gin"
 
-	"github.com/TaffetaEarth/vkr/crud/app/controllers/songs"
-	"github.com/TaffetaEarth/vkr/crud/app/db"
+	"crud/app/controllers"
+	"crud/app/db"
 )
 
 
@@ -14,13 +14,7 @@ func main() {
   r.Use(gin.Recovery())
 
   dbHandler := db.Init()
-  songs.RegisterRoutes(r, dbHandler)
+  controllers.RegisterRoutes(r, dbHandler)
 
-	r.Run()
+  r.Run()	
 }
-
-// func checkErr(err error) {
-//   if err != nil {
-//     log.Fatalln(err)
-//   }
-// }

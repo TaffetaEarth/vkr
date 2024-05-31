@@ -6,10 +6,9 @@ import (
 
 type Album struct {
 	gorm.Model
-	year uint
-	name string
-	author Author
-	songs []Song
+	Year uint
+	Name string
+	Author Author
+	AuthorID *uint
+	Songs []Song
 }
-
-

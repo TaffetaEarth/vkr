@@ -1,8 +1,8 @@
 package minioclient
 
 import (
-	"log"
 	"context"
+	"log"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -10,8 +10,8 @@ import (
 
 const (
 	endpoint = "minio:9000"
-	accessKeyID = "9C2QBjaBZ2eQAzKy0DQr"
-	secretAccessKey = "1voNvvXh1axgMRzR5ykNwd8YrDXY4uuQMdYmS8Q4"
+	accessKeyID = "b7MnhqIG4yiNzdNi91zC"
+	secretAccessKey = "pnI1USkFQHAE8VgPy1FvpO0uAilRBncMPdjJrMAv"
 	bucketName = "music"
 )
 
@@ -22,21 +22,21 @@ func SetupMinioClient() *minio.Client {
 		Secure: false,
 	})
 
-	checkErr(err)
+	CheckErr(err)
 
 	bucketExists, err := minioClient.BucketExists(context.Background(), bucketName);
 	
-	checkErr(err)
+	CheckErr(err)
 
 	if !bucketExists {
 		err := minioClient.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{})
-		checkErr(err)
+		CheckErr(err)
 	}
 
 	return minioClient
 }
 
-func checkErr(err error) {
+func CheckErr(err error) {
 	if err != nil {
 		log.Fatalln(err)
 	}

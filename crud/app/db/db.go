@@ -1,33 +1,24 @@
 package db
 
 import (
-	"log"
-
-	"github.com/TaffetaEarth/vkr/crud/app/models"
+	"crud/app/models"
+	"crud/app/utils"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var dsn = "host=db user=postgres password=change_me dbname=exam_db port=5432"
+var dsn = "host=postgres user=postgres password=change-me dbname=exam-db port=5432"
 
 func Init() *gorm.DB {
     db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
-    if err != nil {
-        log.Fatalln(err)
-    }
+    utils.CheckErr(err)
 
-    checkErr(db.AutoMigrate(&models.Album{}))
-  	checkErr(db.AutoMigrate(&models.Author{}))
-  	checkErr(db.AutoMigrate(&models.Playlist{}))
-  	checkErr(db.AutoMigrate(&models.Song{}))
+    utils.CheckErr(db.AutoMigrate(&models.Album{}))
+  	utils.CheckErr(db.AutoMigrate(&models.Author{}))
+  	utils.CheckErr(db.AutoMigrate(&models.Playlist{}))
+  	utils.CheckErr(db.AutoMigrate(&models.Song{}))
 
     return db
 }
-
-func checkErr(err error) {
-	if err != nil {
-	  log.Fatalln(err)
-	}
-  }

@@ -1,34 +1,52 @@
 services:
-  server:
+  streamer:
     build: streamer
     ports: 
       - 8000:8080
     depends_on:
-      - minio 
-      - db
-      - redis
+      minio: 
+        condition: service_started 
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   crud:
-    build: crud_platform
+    build: crud
     ports: 
       - 8001:8080
     depends_on:
-      - minio 
-      - db
-      - redis
-      
+      postgres:
+        condition: service_healthy
+      minio: 
+        condition: service_started 
+      redis:
+        condition: service_started
+  
+  statworker:
+    build: statworker
+    depends_on:
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
-
-  db:
+  postgres:
     image: postgres:alpine
     environment:
-      POSTGRES_DB: "exam_db"
+      POSTGRES_DB: "exam-db"
       POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "change_me"
+      POSTGRES_PASSWORD: "change-me"
     volumes:
       - .:/docker-entrypoint-initdb.d
     ports:
       - 5432:5432
+    healthcheck:
+      test: pg_isready -U postgres -d exam-db
+      interval: 1s
+      timeout: 5s
+      retries: 5
+
 
   minio:
     image: minio/minio
@@ -50,10 +68,33 @@ services:
     volumes:
       - /dаta:/root/redis
     environment:
-      - REDIS_PASSWORD=change_me
+      - REDIS_PASSWORD=change-me
       - REDIS_PORT=6379
       - REDIS_DATABASES=16
+
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    hostname: rabbitmq
+    restart: always
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=rmuser
+      - RABBITMQ_DEFAULT_PASS=rmpassword
+      - RABBITMQ_DEFAULT_VHOST=/
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit disk_free_limit 2147483648
+    healthcheck:
+      test: rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_local_alarms
+      interval: 1s
+      timeout: 5s
+      retries: 5
 
 volumes:
   minio_storage: {}
 
+networks:
+  rabbitmq:
+    driver: bridge

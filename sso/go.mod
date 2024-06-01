@@ -19,7 +19,7 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
-	github.com/TaffetaEarth/proto v0.0.3
+	github.com/TaffetaEarth/proto v0.0.8
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/joho/godotenv v1.5.1 // indirect

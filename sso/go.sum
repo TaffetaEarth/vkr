@@ -1,9 +1,7 @@
 github.com/BurntSushi/toml v1.2.1 h1:9F2/+DoOYIOksmaJFPw1tGFy1eDnIJXg+UHjuD8lTak=
 github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
-github.com/TaffetaEarth/proto v0.0.1 h1:u0WGOS56Lyesf9zKJUHKtF0+3OhGFZ91stsf6arKeLI=
-github.com/TaffetaEarth/proto v0.0.1/go.mod h1:v4WjZNLey9w4I0RExVb292r1bGPCtVkVhfIgdH0c1kE=
-github.com/TaffetaEarth/proto v0.0.3 h1:ugFE0zVO2RX3Zumqmlic5TDJcK9QCdwsIMyxjH8RSMo=
-github.com/TaffetaEarth/proto v0.0.3/go.mod h1:v1WPjiWHEEpLQnd/RSLNztbEBA+TlB11S9d5meUl28U=
+github.com/TaffetaEarth/proto v0.0.8 h1:EGXE1aurokrZ3jeM4ABj42UJXrjFaWN0cV5jcXQfIy0=
+github.com/TaffetaEarth/proto v0.0.8/go.mod h1:v4WjZNLey9w4I0RExVb292r1bGPCtVkVhfIgdH0c1kE=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

@@ -28,7 +28,7 @@ func Init() *DbHandler {
     return &DbHandler{DB: db}
 }
 
-func (h *DbHandler) SaveUser(cxt context.Context, email string, passHash []byte) (uint, error) {
+func (h *DbHandler) SaveUser(cxt context.Context, email string, passHash []byte) (models.User, error) {
 	const op = "storage.postgres.SaveUser"
 
 	var user models.User
@@ -37,10 +37,10 @@ func (h *DbHandler) SaveUser(cxt context.Context, email string, passHash []byte)
 	user.PassHash = passHash
 
 	if result := h.DB.Create(&user); result.Error != nil {
-		return 0, fmt.Errorf("%s: %w", op, storage.ErrUserExists)
+		return models.User{}, fmt.Errorf("%s: %w", op, storage.ErrUserExists)
 	}
 
-	return user.ID, nil
+	return user, nil
 }
 
 func (h *DbHandler) User(cxt context.Context, email string) (models.User, error) {
@@ -56,3 +56,16 @@ func (h *DbHandler) User(cxt context.Context, email string) (models.User, error)
 
 	return user, nil
 }
+
+func (h *DbHandler) IsAdmin(cxt context.Context, userId uint) (bool, error) {
+	const op = "storage.postgres.User"
+
+	var user models.User
+	
+	if result := h.DB.Model(models.User{IsAdmin: true}).First(&user, userId); result.Error != nil {
+		return false, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
+	}
+
+	return user.IsAdmin, nil
+}
+

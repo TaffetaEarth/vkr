@@ -20,11 +20,12 @@ type UserSaver interface {
 			ctx context.Context,
 			email string,
 			passHash []byte,
-	) (uid uint, err error)
+	) (user models.User, err error)
 }
 
 type UserProvider interface {  
 	User(ctx context.Context, email string) (models.User, error)  
+	IsAdmin(ctx context.Context, userID uint) (bool, error)
 }
 
 type Auth struct {
@@ -54,7 +55,7 @@ var (
 
 // RegisterNewUser registers new user in the system and returns user ID.
 // If user with given username already exists, returns error.
-func (a *Auth) RegisterNewUser(ctx context.Context, email string, pass string) (uint, error) {
+func (a *Auth) RegisterNewUser(ctx context.Context, email string, pass string) (string, error) {
 	// op (operation) - имя текущей функции и пакета. Такую метку удобно
 	// добавлять в логи и в текст ошибок, чтобы легче было искать хвосты
 	// в случае поломок.
@@ -74,18 +75,18 @@ func (a *Auth) RegisterNewUser(ctx context.Context, email string, pass string) (
 	if err != nil {
 			log.Error("failed to generate password hash", sl.Err(err))
 
-			return 0, fmt.Errorf("%s: %w", op, err)
+			return "", fmt.Errorf("%s: %w", op, err)
 	}
 
 	// Сохраняем пользователя в БД
-	id, err := a.usrSaver.SaveUser(ctx, email, passHash)
+	user, err := a.usrSaver.SaveUser(ctx, email, passHash)
 	if err != nil {
 			log.Error("failed to save user", sl.Err(err))
 
-			return 0, fmt.Errorf("%s: %w", op, err)
+			return "", fmt.Errorf("%s: %w", op, err)
 	}
 
-	return id, nil
+	return CreateToken(op, user, a)
 }
 
 func (a *Auth) Login(
@@ -127,6 +128,10 @@ func (a *Auth) Login(
 	log.Info("user logged in successfully")
 
 	// Создаём токен авторизации
+	return CreateToken(op, user, a)
+}
+
+func CreateToken(op string, user models.User, a *Auth) (string, error){
 	token, err := jwt.NewToken(user, a.tokenTTL)
 	if err != nil {
 			a.log.Error("failed to generate token", sl.Err(err))
@@ -135,4 +140,24 @@ func (a *Auth) Login(
 	}
 
 	return token, nil
+}
+
+func (a *Auth) IsAdmin(ctx context.Context, userID uint) (bool, error) {
+	const op = "Auth.IsAdmin"
+
+	log := a.log.With(
+			slog.String("op", op),
+			slog.Uint64("user_id", uint64(userID)),
+	)
+
+	log.Info("checking if user is admin")
+
+	isAdmin, err := a.usrProvider.IsAdmin(ctx, userID)
+	if err != nil {
+			return false, fmt.Errorf("%s: %w", op, err)
+	}
+
+	log.Info("checked if user is admin", slog.Bool("is_admin", isAdmin))
+
+	return isAdmin, nil
 }

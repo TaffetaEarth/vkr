@@ -30,7 +30,8 @@ type Auth interface {
 			ctx context.Context,
 			email string,
 			password string,
-	) (userID uint, err error)
+	) (token string, err error)
+	IsAdmin(ctx context.Context, userID uint) (bool, error)
 }
 
 func Register(gRPCServer *grpc.Server, auth Auth) {  
@@ -51,7 +52,6 @@ func (s *serverAPI) Login(
 
 	token, err := s.auth.Login(ctx, in.GetEmail(), in.GetPassword())
 	if err != nil {
-			// Ошибку auth.ErrInvalidCredentials мы создадим ниже
 			if errors.Is(err, auth.ErrInvalidCredentials) {
 					return nil, status.Error(codes.InvalidArgument, "invalid email or password")
 			}
@@ -74,9 +74,8 @@ func (s *serverAPI) Register(
 			return nil, status.Error(codes.InvalidArgument, "password is required")
 	}
 
-	uid, err := s.auth.RegisterNewUser(ctx, in.GetEmail(), in.GetPassword())
+	token, err := s.auth.RegisterNewUser(ctx, in.GetEmail(), in.GetPassword())
 	if err != nil {
-			// Ошибку storage.ErrUserExists мы создадим ниже
 			if errors.Is(err, storage.ErrUserExists) {
 					return nil, status.Error(codes.AlreadyExists, "user already exists")
 			}
@@ -84,5 +83,25 @@ func (s *serverAPI) Register(
 			return nil, status.Error(codes.Internal, "failed to register user")
 	}
 
-	return &ssov1.RegisterResponse{UserId: uint32(uid)}, nil
+	return &ssov1.RegisterResponse{Token: token}, nil
+}
+
+func (s *serverAPI) IsAdmin(
+	ctx context.Context,
+	in *ssov1.IsAdminRequest,
+) (*ssov1.IsAdminResponse, error) {
+	if in.UserId == 0 {
+			return nil, status.Error(codes.InvalidArgument, "user_id is required")
+	}
+
+	isAdmin, err := s.auth.IsAdmin(ctx, uint(in.GetUserId()))
+	if err != nil {
+			if errors.Is(err, storage.ErrUserNotFound) {
+					return nil, status.Error(codes.NotFound, "user not found")
+			}
+
+			return nil, status.Error(codes.Internal, "failed to check admin status")
+	}
+
+	return &ssov1.IsAdminResponse{IsAdmin: isAdmin}, nil
 }

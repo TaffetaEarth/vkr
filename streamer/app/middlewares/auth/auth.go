@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"crud/app/grpc"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -21,11 +20,12 @@ func extractBearerToken(authHeader string) string {
 }
 
 
-func AuthChecker(log *slog.Logger, appSecret string, grpcClient grpc.Client) gin.HandlerFunc {
+func AuthChecker(log *slog.Logger, appSecret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr := extractBearerToken(c.GetHeader("Authorization"))
 		if tokenStr == "" {
 			fmt.Println("no token provided")
+			c.Set("userAuthorized", false)
 			return
 		}
 		claims := jwt.MapClaims{}
@@ -41,24 +41,10 @@ func AuthChecker(log *slog.Logger, appSecret string, grpcClient grpc.Client) gin
 		if err != nil {
 				log.Warn("failed to parse token")
 				// But if token is invalid, we shouldn't handle request
+				c.Set("userAuthorized", false)
 				return
 		}
 
-		log.Info("user authorized", slog.Any("claims", claims))
-
-		userId := uint(claims["uid"].(float64))
-
-		fmt.Println("user id is", userId)
-
-		// Отправляем запрос для проверки, является ли пользователь админов
-		isAdmin, err := grpcClient.IsAdmin(c, userId)
-		if err != nil {
-				log.Error("failed to check if user is admin")
-				c.Set("userAdmin", false)
-				return
-		}
-
-		c.Set("userAdmin", isAdmin)
-		c.Set("currentUserId", userId)
+		c.Set("userAuthorized", true)
 	}
 }

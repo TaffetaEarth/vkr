@@ -5,12 +5,16 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
+	"os"
 
+	"streamer/app/decoder"
 	"streamer/app/minioclient"
 	"streamer/app/player"
-	"streamer/app/decoder"
 	"streamer/app/statnotifier"
+	"streamer/app/middlewares/auth"
+
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
 )
@@ -18,10 +22,19 @@ import (
 func main() {
 	minioClient := minioclient.SetupMinioClient()
 	r := gin.Default()
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	r.Use(auth.AuthChecker(logger, "secret"))
 
 	r.GET("/stream/:file_name", func(c *gin.Context) {
 		position := c.Query("position")
 		fileName := c.Param("file_name")
+
+		userAuthorized, _ := c.Get("userAuthorized")
+
+		if !userAuthorized.(bool) {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			return
+		}
 
 		var player player.Player
 		var err error

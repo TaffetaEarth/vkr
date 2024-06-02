@@ -34,7 +34,7 @@ func (h handler) UploadFile(ctx *gin.Context) {
       name := uuid.NewString()
       _, err = minioClient.PutObject(c, "music", name, openFile, file.Size, minio.PutObjectOptions{ContentType: "audio/mpeg"})
       if err == nil {
-          song.FileUrl = "localhost:8000/stream/" + name 
+          song.FileName = name 
       }
   } else {
     ctx.JSON(http.StatusBadRequest, err.Error())

@@ -17,6 +17,8 @@ func RegisterRoutes(router *gin.Engine, db *gorm.DB) {
     routes := router.Group("/playlists")
     routes.POST("/", h.CreatePlaylist)
     routes.GET("/", h.GetPlaylists)
+    routes.GET("/my", h.MyPlaylists)
+    routes.PUT("/:id/add_song", h.AddSong)
     routes.GET("/:id", h.GetPlaylist)
     routes.PUT("/:id", h.UpdatePlaylist)
     routes.DELETE("/:id", h.DeletePlaylist)

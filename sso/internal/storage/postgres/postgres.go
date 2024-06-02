@@ -48,9 +48,7 @@ func (h *DbHandler) User(cxt context.Context, email string) (models.User, error)
 
 	var user models.User
 
-	user.Email = email
-
-	if result := h.DB.First(&user); result.Error != nil {
+	if result := h.DB.Where("email = ?", email).Find(&user); result.Error != nil {
 		return models.User{}, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
 	}
 
@@ -58,11 +56,11 @@ func (h *DbHandler) User(cxt context.Context, email string) (models.User, error)
 }
 
 func (h *DbHandler) IsAdmin(cxt context.Context, userId uint) (bool, error) {
-	const op = "storage.postgres.User"
+	const op = "storage.postgres.IsAdmin"
 
 	var user models.User
 	
-	if result := h.DB.Model(models.User{IsAdmin: true}).First(&user, userId); result.Error != nil {
+	if result := h.DB.Where("is_admin = true").Find(&user, userId); result.Error != nil {
 		return false, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
 	}
 

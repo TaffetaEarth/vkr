@@ -10,7 +10,7 @@ type Song struct {
 	AuthorID *uint
 	Album Album
 	AlbumID *uint
-	Playlists []Playlist `gorm:"many2many:songs_playlits;"`
+	Playlists []*Playlist `gorm:"many2many:songs_playlits;"`
 	Name string
-	FileUrl string `gorm:"unique:true"`
+	FileName string `gorm:"unique:true"`
 }

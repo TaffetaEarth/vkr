@@ -15,7 +15,7 @@ import (
 )
 
 type serverAPI struct {
-	ssov1.UnimplementedAuthServer // Хитрая штука, о ней ниже
+	ssov1.UnimplementedAuthServer
 	auth Auth
 }
 

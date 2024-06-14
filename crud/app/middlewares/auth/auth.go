@@ -50,7 +50,7 @@ func AuthChecker(log *slog.Logger, appSecret string, grpcClient grpc.Client) gin
 
 		fmt.Println("user id is", userId)
 
-		// Отправляем запрос для проверки, является ли пользователь админов
+		// Отправляем запрос для проверки, является ли пользователь админом
 		isAdmin, err := grpcClient.IsAdmin(c, userId)
 		if err != nil {
 				log.Error("failed to check if user is admin")

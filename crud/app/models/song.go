@@ -6,11 +6,11 @@ import (
 
 type Song struct {
 	gorm.Model
-	Author Author
+	Author *Author
 	AuthorID *uint
-	Album Album
+	Album *Album
 	AlbumID *uint
-	Playlists []*Playlist `gorm:"many2many:songs_playlits;"`
+	Playlists []*Playlist `gorm:"many2many:songs_playlists;"`
 	Name string
 	FileName string `gorm:"unique:true"`
 }

@@ -8,7 +8,7 @@ type Album struct {
 	gorm.Model
 	Year uint
 	Name string
-	Author Author
+	Author *Author
 	AuthorID *uint
-	Songs []Song
+	Songs []*Song
 }

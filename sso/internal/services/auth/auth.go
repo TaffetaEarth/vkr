@@ -9,7 +9,7 @@ import (
 
 	"sso/internal/domain/models"
 	"sso/internal/lib/logger/sl"
-	"sso/internal/lib/logger/sl/jwt"
+	"sso/internal/lib/jwt"
 	"sso/internal/storage"
 
 	"golang.org/x/crypto/bcrypt"

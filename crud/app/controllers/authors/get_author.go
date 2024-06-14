@@ -13,7 +13,7 @@ func (h handler) GetAuthor(ctx *gin.Context) {
 
     var Author models.Author
 
-    if result := h.DB.First(&Author, id); result.Error != nil {
+    if result := h.DB.Preload("Songs").Preload("Albums").First(&Author, id); result.Error != nil {
         ctx.JSON(http.StatusNotFound, result.Error)
         return
     }

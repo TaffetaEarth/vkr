@@ -33,7 +33,7 @@ func (h handler) UpdateAuthor(ctx *gin.Context) {
     author.Name = body.Name
 
     if result := h.DB.Save(&author); result.Error != nil {
-        ctx.JSON(http.StatusNotFound, result.Error)
+        ctx.JSON(http.StatusBadRequest, result.Error)
         return
     }
 

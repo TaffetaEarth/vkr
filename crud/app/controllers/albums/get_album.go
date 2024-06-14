@@ -13,7 +13,7 @@ func (h handler) GetAlbum(ctx *gin.Context) {
 
     var album models.Album
 
-    if result := h.DB.First(&album, id); result.Error != nil {
+    if result := h.DB.Preload("Songs").Preload("Author").First(&album, id); result.Error != nil {
         ctx.JSON(http.StatusNotFound, result.Error)
         return
     }

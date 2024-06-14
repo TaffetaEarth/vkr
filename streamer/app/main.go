@@ -10,13 +10,14 @@ import (
 	"os"
 
 	"streamer/app/decoder"
+	"streamer/app/middlewares/auth"
 	"streamer/app/minioclient"
 	"streamer/app/player"
 	"streamer/app/statnotifier"
-	"streamer/app/middlewares/auth"
 
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
+	"github.com/penglongli/gin-metrics/ginmetrics"
 )
 
 func main() {
@@ -24,6 +25,20 @@ func main() {
 	r := gin.Default()
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	r.Use(auth.AuthChecker(logger, "secret"))
+
+	metricRouter := gin.Default()
+
+	m := ginmetrics.GetMonitor()	
+	// use metric middleware without expose metric path
+	m.SetMetricPath("/metrics")
+	// m.UseWithoutExposingEndpoint(r)
+	// set metric path expose to metric router
+	// m.Expose(metricRouter)
+	m.Use(r)
+
+	go func() {
+		_ = metricRouter.Run(":8082")
+	}()
 
 	r.GET("/stream/:file_name", func(c *gin.Context) {
 		position := c.Query("position")

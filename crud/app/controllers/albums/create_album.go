@@ -11,7 +11,7 @@ import (
 type CreateAlbumRequestBody struct {
     Name      string `json:"title"`
     AuthorID  uint `json:"author_id"`
-    SongsIDs  []uint `json:"song_ids"`
+    SongsIDs  []uint
     Year      uint `json:"year"`
 }
 
@@ -26,11 +26,16 @@ func (h handler) CreateAlbum(ctx *gin.Context) {
 	var author models.Author
 	var album models.Album
 
-	h.DB.FirstOrCreate(&author, body.AuthorID)
+	if body.AuthorID != 0 {
+    h.DB.FirstOrCreate(&author, body.AuthorID)
+    album.Author = &author
+    h.DB.Model(&author).Association("Albums").Append(&album)
+  } else {
+    album.AuthorID = nil
+  }
 
     album.Name = body.Name
     album.Year = body.Year
-    album.Author = author
 
     if result := h.DB.Create(&album); result.Error != nil {
         ctx.JSON(http.StatusNotFound, result.Error)
@@ -39,6 +44,9 @@ func (h handler) CreateAlbum(ctx *gin.Context) {
 
     var songsArray []models.Song
 
+    if len(body.SongsIDs) == 0 {
+        body.SongsIDs = []uint{0}
+    }
     h.DB.Find(&songsArray, body.SongsIDs)
 
 	h.DB.Model(&album).Association("Songs").Append(&songsArray)

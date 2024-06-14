@@ -2,8 +2,8 @@ package statistics
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
@@ -32,9 +32,11 @@ func (rh *redisHandler) GetCharts(ctx *gin.Context) {
     result:= rh.R.ZRangeByScore(context, "statistics", &redis.ZRangeBy{Min: "-inf", Max: "+inf", Offset: 0, Count: 10}) 
     
     fileList, err := result.Result()
+
+    fmt.Println(fileList) 
     
     if err != nil {
-        ctx.JSON(http.StatusUnauthorized, gin.H{"error": err})
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
         return
     }
     if len(fileList) == 0{
@@ -43,13 +45,7 @@ func (rh *redisHandler) GetCharts(ctx *gin.Context) {
     }
     var songs []models.Song
 
-    rh.DB.Raw(`select s.*
-    from songs s
-      join unnest(array[?]) with ordinality as x (file_name, ordering) 
-        on s.file_name = x.file_name
-    order by x.ordering
-    `, strings.Join(fileList, ", ")).Scan(&songs)
-    
+    rh.DB.Model(&models.Song{}).Where("file_name in ?", fileList).Find(&songs)
 
     ctx.JSON(http.StatusOK, &songs)
 }

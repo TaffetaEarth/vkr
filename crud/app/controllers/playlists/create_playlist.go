@@ -10,17 +10,17 @@ import (
 
 type CreatePlaylistRequestBody struct {
     Name      string `json:"name"`
-    SongsIDs  []uint 
+    SongsIDs  []uint `json:"songs_ids"`
 }
 
 func (h handler) CreatePlaylist(ctx *gin.Context) {
     currentUserIdString, _ := ctx.Get("currentUserId")
 
-    currentUserId := currentUserIdString.(uint)
-
-    if currentUserId == 0 {
-        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+    if currentUserIdString == nil {
+        ctx.JSON(http.StatusUnauthorized,gin.H{"error": "unauthorized"})
     }
+
+    currentUserId := currentUserIdString.(uint)
 
     body := CreatePlaylistRequestBody{}
 
@@ -40,7 +40,7 @@ func (h handler) CreatePlaylist(ctx *gin.Context) {
 
     var songsArray []models.Song
 
-    h.DB.Find(&songsArray, body.SongsIDs)
+    h.DB.Where("id IN ?", body.SongsIDs).Find(&songsArray)
 	h.DB.Model(&playlist).Association("Songs").Append(&songsArray)
     
     ctx.JSON(http.StatusCreated, &playlist)

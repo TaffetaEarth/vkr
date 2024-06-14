@@ -1,6 +1,7 @@
 package authors
 
 import (
+	"fmt"
 	"net/http"
 
 	"crud/app/models"
@@ -10,8 +11,8 @@ import (
 
 type CreateAuthorRequestBody struct {
     Name      string `json:"name"`
-    AlbumIDs  uint `json:"album_ids"`
-    SongsIDs  []uint `json:"song_ids"`
+    AlbumsIDs []uint `json:"albums_ids"`
+    SongsIDs  []uint `json:"songs_ids"`
 }
 
 func (h handler) CreateAuthor(ctx *gin.Context) {
@@ -34,8 +35,10 @@ func (h handler) CreateAuthor(ctx *gin.Context) {
     var songsArray []models.Song
     var albumsArray []models.Album
 
-    h.DB.Find(&songsArray, body.SongsIDs)
-    h.DB.Find(&albumsArray, body.AlbumIDs)
+    fmt.Println(body)
+
+    h.DB.Where("id IN ?", body.SongsIDs).Find(&songsArray)
+    h.DB.Where("id IN ?", body.AlbumsIDs).Find(&albumsArray)
 
 	h.DB.Model(&author).Association("Songs").Append(&songsArray)
 	h.DB.Model(&author).Association("Albums").Append(&albumsArray)

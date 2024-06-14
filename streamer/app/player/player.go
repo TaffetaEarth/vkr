@@ -30,7 +30,7 @@ func (player *Player) LoadChunks() {
 		case <-player.EndSignal:
 			return
 		default:
-			buffer := make([]byte, 10000)
+			buffer := make([]byte, 1)
 
 			bytesRead, err := player.File.Read(buffer)
 		
@@ -46,11 +46,11 @@ func (player *Player) LoadChunks() {
 	}
 }
 
-func (p Player) Rewind(position string){
+func (p *Player) Rewind(position string){
 	intPosition, err := strconv.Atoi(position) 
 	p.CurrentStop = int64(intPosition)
 
-		if err != nil {
-			fmt.Println(err)
-		}
+	if err != nil {
+		fmt.Println(err)
+	}
 }

@@ -13,7 +13,7 @@ func (h handler) GetPlaylist(ctx *gin.Context) {
 
     var Playlist models.Playlist
 
-    if result := h.DB.First(&Playlist, id); result.Error != nil {
+    if result := h.DB.Preload("Songs").First(&Playlist, id); result.Error != nil {
         ctx.JSON(http.StatusNotFound, result.Error)
         return
     }

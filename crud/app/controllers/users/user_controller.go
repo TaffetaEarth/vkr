@@ -58,7 +58,7 @@ func (h grpcHandler) Register(ctx *gin.Context) {
     }
     token, err := h.G.Register(context.Background(), body.Email, body.Password) 
     if err != nil {
-        ctx.JSON(http.StatusUnauthorized, gin.H{"error": err})
+        ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err})
         return
     } 
     ctx.JSON(http.StatusOK, gin.H{"token": token})
